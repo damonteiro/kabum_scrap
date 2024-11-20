@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-api_url = "http://127.0.0.1:5000/"
+api_url = "127.0.0.1:5000"
 
 response = requests.get(api_url)
 if response.status_code == 200:
