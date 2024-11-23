@@ -78,11 +78,11 @@ if tipo_grafico == 'univariada':
         axs[0, 1].set_title("Boxplot de Preços de Notebooks", fontsize=16)
 
         # Terceiro gráfico: Contagem de Notebooks
-        notebook_counts = df_lido['notebook'].value_counts()
-        axs[1, 0].bar(notebook_counts.index, notebook_counts.values, color='green', linewidth=2, edgecolor='black')
-        axs[1, 0].set_title("Contagem de Notebooks", fontsize=16)
+        preço_por_notebook = df_lido.groupby('notebook')['preco'].sum()  # Agrupando e somando os preços
+        axs[1, 0].bar(preço_por_notebook.index, preço_por_notebook.values, color='green', linewidth=2, edgecolor='black')
+        axs[1, 0].set_title("Soma dos Preços por Notebook", fontsize=16)
         axs[1, 0].set_xlabel("Nome do Notebook", fontsize=14)
-        axs[1, 0].set_ylabel("Contagem", fontsize=14)
+        axs[1, 0].set_ylabel("Preço Total (R$)", fontsize=14)
         axs[1, 0].tick_params(axis='x', rotation=45)  # Inclina os rótulos para facilitar leitura
 
         # Quarto gráfico: Gráfico de Pizza (distribuição de preços)
