@@ -40,15 +40,15 @@ st.sidebar.header('Tipo de análise estatística:')
 estatistica_escolhida = st.sidebar.selectbox('Selecione o tipo de análise', tipos_analise)
 
 # Calcular estatísticas básicas
-if estatistica_escolhida == 'Média':
+if estatistica_escolhida == 'Valor da Média':
     media = df_lido['preco'].mean()
     st.sidebar.header("Estatísticas:")
     st.sidebar.write(f"O valor de Média dos preços de todos os notebooks: R$ {media:.2f}")
-elif estatistica_escolhida == 'Mediana':
+elif estatistica_escolhida == 'Valor da Mediana':
     mediana = df_lido['preco'].median()
     st.sidebar.header("Estatísticas:")
     st.sidebar.write(f"O valor de Mediana dos preços de todos os notebooks: R$ {mediana:.2f}")
-elif estatistica_escolhida == 'DP':
+elif estatistica_escolhida == 'Desvio Padrão':
     desvio_padrao = df_lido['preco'].std()
     st.sidebar.header("Estatísticas:")
     st.sidebar.write(f"O Desvio Padrão dos preços de todos os notebooks: R$ {desvio_padrao:.2f}")
