@@ -1,108 +1,112 @@
 import streamlit as st
-import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from sqlalchemy import create_engine
 
-api_url = "127.0.0.1:5000"
+# Criar o banco de dados SQLite
+engine = create_engine('sqlite:///banco.db', echo=True)
 
-response = requests.get(api_url)
-if response.status_code == 200:
-    data = response.json()
-    metrics = data['metrics']
-    dados_gerais = pd.DataFrame(data['data'])
-    descontos = dados_gerais['% Desconto']
-else:
-    st.error("Erro ao conectar à API")
-    st.stop()
-    
+# Criar um DataFrame com os dados (se necessário, ajuste ou carregue de outra fonte)
+data = {
+    "percent": [5, 10, 15],
+    "oferta": ["Em itens selecionados", "Desconto especial", "Promoção relâmpago"],
+    "link": [
+        "www.kabum.com.br/promocao/TOPDOKABUM2024",
+        "www.kabum.com.br/promocao/DESCONTO2024",
+        "www.kabum.com.br/promocao/RELAMPAGO2024",
+    ],
+    "cupom": ["TOPDOKABUM", "DESCONTO10", "FLASH15"],
+}
+df = pd.DataFrame(data)
 
-tipos_analise = [None,'Média','Mediana','DP']
+# Salvando os dados no banco de dados SQLite
+df.to_sql('dados', con=engine, if_exists='replace', index=False)
 
+# Lendo os dados do banco
+df_lido = pd.read_sql('SELECT * FROM dados', con=engine)
+
+# Opções para análise estatística
+tipos_analise = [None, 'Média', 'Mediana', 'DP']
 st.sidebar.header('Tipo de análise estatística:')
-estatisca_escolhida = st.sidebar.selectbox('Selecione o tipo de análise', tipos_analise)
+estatistica_escolhida = st.sidebar.selectbox('Selecione o tipo de análise', tipos_analise)
 
-if estatisca_escolhida == None:
-    pass
-elif estatisca_escolhida =='Média':
+# Calcular estatísticas básicas
+if estatistica_escolhida == 'Média':
+    media = df_lido['percent'].mean()
     st.sidebar.header("Estatísticas:")
-    st.sidebar.write(f"Média: {metrics['mean']:.2f}")
-elif estatisca_escolhida =='Mediana':
+    st.sidebar.write(f"Média: {media:.2f}")
+elif estatistica_escolhida == 'Mediana':
+    mediana = df_lido['percent'].median()
     st.sidebar.header("Estatísticas:")
-    st.sidebar.write(f"Mediana: {metrics['median']:.2f}")
-else:
+    st.sidebar.write(f"Mediana: {mediana:.2f}")
+elif estatistica_escolhida == 'DP':
+    desvio_padrao = df_lido['percent'].std()
     st.sidebar.header("Estatísticas:")
-    st.sidebar.write(f"Desvio Padrão: {metrics['std_dev']:.2f}")
-    
+    st.sidebar.write(f"Desvio Padrão: {desvio_padrao:.2f}")
 
-graficos = ['univariada','multivariada']
-
+# Gráficos
+graficos = ['univariada', 'multivariada']
 st.sidebar.header('Gráficos:')
-tipo_grafico = st.sidebar.selectbox('Selecione um tipo de análise gráfica',graficos)
+tipo_grafico = st.sidebar.selectbox('Selecione um tipo de análise gráfica', graficos)
 
 st.subheader("Gráficos e Visualizações")
 
 if tipo_grafico == 'univariada':
-
     expander1 = st.expander('Sessão Gráficos Univariados')
 
     with expander1:
         fig, axs = plt.subplots(3, 1, figsize=(10, 10))
 
-# Primeiro gráfico
-        axs[0].hist(descontos, bins=10, color='blue', alpha=0.7)
-        axs[0].set_title("Histograma de Descontos")
+        # Primeiro gráfico: Histograma
+        axs[0].hist(df_lido['percent'], bins=10, color='blue', alpha=0.7)
+        axs[0].set_title("Histograma de Percentuais de Desconto")
 
-# Segundo gráfico
-        axs[1].plot(sorted(descontos), marker='o')
-        axs[1].set_title("Descontos Ordenados")
+        # Segundo gráfico: Percentuais Ordenados
+        axs[1].plot(sorted(df_lido['percent']), marker='o')
+        axs[1].set_title("Percentuais Ordenados")
 
-#terceiro gráfico
-
-        Q1 = np.percentile(descontos, 25)
-        Q3 = np.percentile(descontos, 75)
+        # Terceiro gráfico: Boxplot
+        Q1 = np.percentile(df_lido['percent'], 25)
+        Q3 = np.percentile(df_lido['percent'], 75)
         I = Q3 - Q1
-        max = Q3 + 1.5 * I
-        min = Q1 - 1.5 * I
-        outlier = []
-        mediana = np.median(descontos)
+        max_outlier = Q3 + 1.5 * I
+        min_outlier = Q1 - 1.5 * I
+        outliers = df_lido[(df_lido['percent'] > max_outlier) | (df_lido['percent'] < min_outlier)]
 
-        for i in range(len(descontos)):
-            if descontos[i] > max or descontos[i]<min:
-                outlier.append(descontos[i])
+        sns.boxplot(x=df_lido['percent'], ax=axs[2])
+        axs[2].set_title("Boxplot de Percentuais de Desconto")
 
-        sns.boxplot(x=descontos, ax=axs[2])
-        axs[2].set_title("Boxplot de Descontos")
-
-# Exibindo no Streamlit
+        # Exibindo no Streamlit
         st.pyplot(fig)
 
-        if len(outlier)>0:
-            for i in outlier:
-                st.write(f'outliers: {i}')
+        if not outliers.empty:
+            st.write("Outliers detectados:")
+            st.write(outliers)
         else:
-            st.write('Nenhum outlier detectado')
+            st.write("Nenhum outlier detectado.")
 
-elif tipo_grafico =='multivariada':
+elif tipo_grafico == 'multivariada':
     expander2 = st.expander('Sessão Gráficos Multivariados')
 
     with expander2:
-        fig2,ax2 = plt.subplots(figsize=(10,6))
+        fig2, ax2 = plt.subplots(figsize=(10, 6))
 
+        # Gráfico de dispersão
         sns.scatterplot(
-            x=descontos,  # Usa a variável 'descontos' diretamente para o eixo X
-            y=dados_gerais['Cupom'],  # Índices do DataFrame para o eixo Y
-            hue=dados_gerais['Oferta'],  # Diferencia os pontos pela coluna 'Cupom'
-            palette="viridis", 
-            s=100, # Tamanho dos pontos
+            x=df_lido['percent'],
+            y=df_lido.index,  # Utilizando o índice como um eixo para representar as ofertas
+            hue=df_lido['oferta'],
+            palette="viridis",
+            s=100,  # Tamanho dos pontos
             ax=ax2
         )
 
-        ax2.set_title("Relação da media de Desconto por Desconto")
-        ax2.set_xlabel("% Desconto")
-        ax2.set_ylabel("Oferta (Índice)")
+        ax2.set_title("Relação dos Percentuais de Desconto com Ofertas")
+        ax2.set_xlabel("Percentual de Desconto")
+        ax2.set_ylabel("Índice das Ofertas")
         ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
         st.pyplot(fig2)
-        st.write('Pela falta de dados comparativos númericos, não foi possível criar um gráfico de disperção ideal.')
+        st.write("Gráfico de dispersão mostrando os percentuais de desconto por oferta.")
