@@ -43,19 +43,6 @@
         <li><strong>SQLAlchemy</strong>: Para conexão e armazenamento dos dados em um banco de dados SQLite.</li>
     </ul>
 
-   <h2>Instalação</h2>
-    <p>Para instalar e rodar este projeto, siga os passos abaixo:</p>
-    <ol>
-        <li>Clone o repositório:
-            <pre><code>git clone https://github.com/seu-usuario/projeto-preco-notebooks.git</code></pre>
-        </li>
-        <li>Instale as dependências:
-            <pre><code>pip install -r requirements.txt</code></pre>
-        </li>
-        <li>Execute o app Streamlit:
-            <pre><code>streamlit run app.py</code></pre>
-        </li>
-    </ol>
 
    <h2>Como Funciona</h2>
     <p>O projeto funciona da seguinte maneira:</p>
@@ -65,10 +52,6 @@
         <li><strong>Interface Interativa</strong>: A interface foi construída utilizando o Streamlit, que permite a interação do usuário com os dados de forma simples e rápida.</li>
     </ul>
 
-   <h2>Exemplo de Uso</h2>
-    <p>Após rodar o aplicativo, você poderá interagir com as opções na barra lateral, escolhendo o tipo de análise estatística e os gráficos que deseja visualizar. As opções de gráficos incluem histogramas, boxplots, gráficos de barras e dispersão, fornecendo uma compreensão clara sobre a distribuição e relações entre os dados dos notebooks.</p>
 
-   <h2>Contribuições</h2>
-    <p>Contribuições são bem-vindas! Se você tiver sugestões de melhorias ou correções, sinta-se à vontade para abrir um <strong>issue</strong> ou <strong>pull request</strong>.</p>
 </body>
 </html>
