@@ -87,7 +87,7 @@ st.sidebar.header('Gráficos:')
 tipo_grafico = st.sidebar.selectbox('Selecione um tipo de análise gráfica', graficos)
 
 st.subheader("Gráficos e Visualizações")
-
+showCupons = st.expander("Cupons")
 if tipo_grafico == 'univariada':
     expander1 = st.expander('Sessão Gráficos Univariados')
 
