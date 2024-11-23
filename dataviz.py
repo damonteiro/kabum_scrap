@@ -35,7 +35,7 @@ df.to_sql('dados', con=engine, if_exists='replace', index=False)
 df_lido = pd.read_sql('SELECT * FROM dados', con=engine)
 
 # Opções para análise estatística
-tipos_analise = [None, 'Média', 'Mediana', 'DP']
+tipos_analise = ['Valor da Média', 'Valor da Mediana', 'Desvio Padrão']
 st.sidebar.header('Tipo de análise estatística:')
 estatistica_escolhida = st.sidebar.selectbox('Selecione o tipo de análise', tipos_analise)
 
@@ -54,14 +54,14 @@ elif estatistica_escolhida == 'DP':
     st.sidebar.write(f"O Desvio Padrão dos preços de todos os notebooks: R$ {desvio_padrao:.2f}")
 
 # Gráficos
-graficos = ['univariada', 'multivariada']
+graficos = ['Gráficos Univariados', 'Gráficos Multivariados']
 st.sidebar.header('Gráficos:')
 tipo_grafico = st.sidebar.selectbox('Selecione um tipo de análise gráfica', graficos)
 
 st.subheader("Gráficos e Visualizações")
 
 # Gráficos Univariados
-if tipo_grafico == 'univariada':
+if tipo_grafico == 'Gráficos Univariados':
     expander1 = st.expander('Sessão Gráficos Univariados')
 
     with expander1:
@@ -94,7 +94,7 @@ if tipo_grafico == 'univariada':
         st.pyplot(fig)
 
 # Gráficos Multivariados
-elif tipo_grafico == 'multivariada':
+elif tipo_grafico == 'Gráficos Multivariados':
     expander2 = st.expander('Sessão Gráficos Multivariados')
 
     with expander2:
